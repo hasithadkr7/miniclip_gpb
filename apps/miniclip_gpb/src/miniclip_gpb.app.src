@@ -5,7 +5,8 @@
   {mod, {miniclip_gpb_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    ranch
    ]},
   {env,[]},
   {modules, []},
