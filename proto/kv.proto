@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+package kv.proto;
+
 message data {
   required string key = 1;
   required string value = 2;

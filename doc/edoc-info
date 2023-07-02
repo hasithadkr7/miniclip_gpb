@@ -1,0 +1,5 @@
+%% encoding: UTF-8
+{application,miniclip_gpb}.
+{modules,[miniclip_gpb_app,miniclip_gpb_client_test,miniclip_gpb_proto_test,
+          miniclip_gpb_protocol_handler,miniclip_gpb_sup,miniclip_gpb_utils,
+          miniclip_gpb_worker_fsm,miniclip_gpb_worker_fsm_sup]}.
