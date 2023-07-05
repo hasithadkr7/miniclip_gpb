@@ -19,7 +19,7 @@
 -include("kv_pb.hrl").
 
 encode_set_request_envelope(Key, Value) ->
-    io:format("encode_set_request_envelope|Key, Value:~p~n", [[Key, Value]]),
+    io:format("encode_set_request_envelope|[Key, Value]:~p~n", [[Key, Value]]),
     %%  Req = #req_envelope{type = "set_request", set_req = #set_request{req = #data{key = "name", value = "hasitha dhananjaya adikari"}}},
     Req = #req_envelope{type = set_request_t,
                         set_req = #set_request{req = #data{key = Key, value = Value}}},

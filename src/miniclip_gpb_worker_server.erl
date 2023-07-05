@@ -92,9 +92,9 @@ handle_cast({request,
               undefined,
               undefined} =
                  DecodePayload},
-            #state{key_id = KeyId, socket = Socket} = State) ->
+            #state{socket = Socket} = State) ->
     io:format("handle_cast|set_request_t|DecodePayload : ~p~n", [DecodePayload]),
-    ErrorT = store_data(KeyId, Key, Data),
+    ErrorT = store_data(Key, Data),
     send_set_request_response(Socket, ErrorT),
     {noreply, State};
 handle_cast({request,
@@ -120,10 +120,10 @@ handle_cast(Request, State) ->
                      {noreply, NewState :: #state{}, timeout() | hibernate} |
                      {stop, Reason :: term(), NewState :: #state{}}.
 handle_info({tcp, _Socket, Payload}, #state{worker_id = WorkerId} = State) ->
-    io:format("handle_info|Payload : ~p~n", [Payload]),
+    io:format("handle_info|tcp|Payload : ~p~n", [Payload]),
     DecodePayload = miniclip_gpb_utils:decode_request_payload(Payload),
     io:format("handle_info|DecodePayload : ~p~n", [DecodePayload]),
-    io:format("handle_info|self : ~p~n", [self()]),
+    io:format("handle_info|tcp|self : ~p~n", [self()]),
     gen_server:cast(WorkerId, {request, DecodePayload}),
     {noreply, State};
 handle_info({tcp_closed, _Socket}, State) ->
@@ -160,33 +160,26 @@ code_change(_OldVsn, State = #state{}, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-store_data(KeyId, Key, Data) ->
-    io:format("store_data|Data:~p~n", [Data]),
-    case miniclip_gpb_utils:encrypt_data(KeyId, Data) of
-        {ok, CiphertextBlob} ->
-            miniclip_gpb_utils:store_data(Key, CiphertextBlob);
+store_data(Key, Data) ->
+    io:format("~p|~p|store_data|Data:~p~n", [?MODULE, ?LINE, Data]),
+    case miniclip_gpb_utils:encrypt_data(Data) of
+        {ok, {EncryptedKey, EncryptedData}} ->
+            io:format("~p|~p|store_data|EncryptedData:~p~n", [?MODULE, ?LINE, EncryptedData]),
+            miniclip_gpb_utils:store_data(Key, EncryptedKey, EncryptedData);
         {error, internal} ->
             internal
     end.
 
 retrieve_data(Key) ->
-    io:format("retrieve_data|Key:~p~n", [Key]),
-    case miniclip_gpb_utils:retrieve_data(Key) of
-        {ok, EncryptedData} ->
-            io:format("retrieve_data|EncryptedData:~p~n", [EncryptedData]),
-            miniclip_gpb_utils:decrypt_data(EncryptedData);
-        {error, ErrorT} ->
-            io:format("retrieve_data|ErrorT:~p~n", [ErrorT]),
-            {error, ErrorT}
-    end.
+    io:format("~p|~p|retrieve_data|Key:~p~n", [?MODULE, ?LINE, Key]),
+    miniclip_gpb_utils:retrieve_data(Key).
 
 send_set_request_response(Socket, ErrorT) ->
-    io:format("send_set_request_response|ErrorT:~p~n", [ErrorT]),
+    io:format("~p|~p|send_set_request_response|ErrorT:~p~n", [?MODULE, ?LINE, ErrorT]),
     Response = miniclip_gpb_utils:create_response({set_request, []}, ErrorT),
     miniclip_gpb_utils:send_response(Socket, Response).
 
 send_get_request_response(Socket, Key, Data, ErrorT) ->
-    io:format("send_get_request_response|Data:~p~n", [Data]),
-    io:format("send_get_request_response|ErrorT:~p~n", [ErrorT]),
+    io:format("~p|~p|send_get_request_response|ErrorT:~p~n", [?MODULE, ?LINE, ErrorT]),
     Response = miniclip_gpb_utils:create_response({get_request, {Key, Data}}, ErrorT),
     miniclip_gpb_utils:send_response(Socket, Response).
