@@ -1,19 +1,17 @@
 [
   {miniclip_gpb, [
-    {port, 5555},
-    {listener_count, 5},
-
-    {aws_access_key_id, "ACCESS_KEY_ID"},
-    {aws_secret_access_key, "SECRET_ACCESS_KEY"},
-    {aws_kms_key_id, <<"KMS_KEY_ID">>},
-    {aws_data_table_name, <<"TABLE_NAME">>},
-
+    {port, ${PORT}},
+    {listener_count, ${WORKER_COUNT}},
+    {aws_access_key_id, "${ACCESS_KEY_ID}"},
+    {aws_secret_access_key, "${SECRET_ACCESS_KEY}"},
+    {aws_kms_key_id, <<"${KMS_KEY_ID}">>},
+    {aws_data_table_name, <<"${TABLE_NAME}">>},
     {aws_data_key_size, 16}
   ]},
   {lager, [
     {handlers, [
       {lager_console_backend, [
-        {level, debug},
+        {level, ${LOG_LEVEL}},
         {formatter, lager_default_formatter},
         {formatter_config, [color, time, " [", severity, "] ",
           {module, [module, ":", {function, ""}, ":", line, ": "], ""},
