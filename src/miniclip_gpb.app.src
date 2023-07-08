@@ -4,7 +4,7 @@
   {vsn, "0.1.0"},
   {registered, []},
   {mod, {miniclip_gpb_app, []}},
-  {applications, [kernel, stdlib, ranch, erlcloud]},
+  {applications, [kernel, stdlib, lager, erlcloud]},
   {env, []},
   {modules, []},
   {licenses, ["Apache-2.0"]},

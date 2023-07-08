@@ -8,8 +8,6 @@
 %%%-------------------------------------------------------------------
 -module(miniclip_gpb_socket_server_sup).
 
--author("hasitha").
-
 -behaviour(supervisor).
 
 %% API
@@ -41,10 +39,6 @@ child_spec() ->
 %%%===================================================================
 
 %% @private
-%% @doc Whenever a supervisor is started using supervisor:start_link/[2,3],
-%% this function is called by the new process to find out about
-%% restart strategy, maximum restart frequency and child
-%% specifications.
 -spec init(Args :: term()) ->
               {ok,
                {SupFlags ::
@@ -56,7 +50,6 @@ child_spec() ->
               {error, Reason :: term()}.
 init([]) ->
     {ok, Port} = application:get_env(miniclip_gpb, port),
-    %%    {ok, ListenSocket} = gen_tcp:listen(Port, [{active, true}, {packet, line}]),
     case gen_tcp:listen(Port, [binary, {active, true}, {packet, 4}]) of
         {ok, ListenSocket} ->
             spawn_link(fun empty_listeners/0),
@@ -68,21 +61,21 @@ init([]) ->
                 1000,
                 worker,
                 [miniclip_gpb_worker_server]}]}};
-        _ ->
-            io:format("miniclip_gpb_socket_server_sup|init|error. ~n", []),
+        Error ->
+            ok = lager:error("tcp connection|Error: ~p~n", [Error]),
             ignore
     end.
 
 -spec start_socket() -> ok.
 start_socket() ->
-    io:format("start_socket : ~p~n", [?MODULE]),
-    Res = supervisor:start_child(?MODULE, []),
-    io:format("start_socket|Res : ~p~n", [Res]).
+    {ok, _} = supervisor:start_child(?MODULE, []).
 
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================
+-spec empty_listeners() -> ok.
 empty_listeners() ->
     {ok, ListenerCount} = application:get_env(miniclip_gpb, listener_count),
     [start_socket() || _ <- lists:seq(1, ListenerCount)],
     ok.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
