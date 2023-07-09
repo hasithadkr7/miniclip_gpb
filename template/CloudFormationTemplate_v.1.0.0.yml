@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2023-07-09"
+Description: Google protocol buffer service
+Parameters:
+  SourceCodeBucket:
+    Description: Bucket name
+    Type: String
+  Version:
+    Description: Docker image version
+    Type: String
+
+Resources:
+  Ec2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-776a659d"
+      InstanceType: "t2.micro"
+      IamInstanceProfile: !Ref ec2InstanceProfile
+      KeyName: "id_rsa.pub"
+      UserData:
+        'Fn::Base64': !Sub |
+          #cloud-config
+          cloud_final_modules:
+          - [scripts-user, always]
+          runcmd:
+            - sudo yum -y install docker
+            - sudo service docker start
+            - sudo docker pull hasithadkr7/miniclip_gpb:v0.0.1
+            - sudo docker run --name miniclip_gpb -dp 5555:5555 hasithadkr7/miniclip_gpb:v0.0.1
+
+  ec2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref RootRole
+
+  RootRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2023-09-09"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: DockerAuth
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetRepositoryPolicy
+                  - ecr:DescribeRepositories
+                  - ecr:ListImages
+                  - ecr:BatchGetImage
+                Effect: Allow
+                Resource: "*"
+            Version: "2023-09-09"
