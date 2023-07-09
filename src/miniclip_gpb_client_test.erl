@@ -12,17 +12,19 @@
 -export([set_data/2, get_data/1, store_data1/0, store_data2/0, encrypt_test/2,
          decrypt_test/2, get_data_key/1, aws_dynamo_db_get_test/1]).
 
-get_data(Key) ->
+get_data(Key) when is_list(Key) ->
     {ok, Sock} = gen_tcp:connect("localhost", 5555, [binary, {packet, 4}]),
     Envelop = miniclip_gpb_proto_test:encode_get_request_envelope(Key),
+    ok = gen_tcp:send(Sock, Envelop);
+get_data(Key) ->
+    ok = lager:error("get_data|invalid key type|Key:~p~n", [Key]).
 
-    ok = gen_tcp:send(Sock, Envelop).
-
-set_data(Key, Value) ->
+set_data(Key, Value) when is_list(Key), is_list(Value) ->
     {ok, Sock} = gen_tcp:connect("localhost", 5555, [binary, {packet, 4}]),
     Envelop = miniclip_gpb_proto_test:encode_set_request_envelope(Key, Value),
-
-    ok = gen_tcp:send(Sock, Envelop).%%    ok = gen_tcp:close(Sock).
+    ok = gen_tcp:send(Sock, Envelop);
+set_data(Key, Value) ->
+    ok = lager:error("get_data|invalid key/value type|Key:~p|Value:~p~n", [Key, Value]).
 
 store_data1() ->
     Key = "test_key1",
