@@ -2,6 +2,7 @@
 %%% @author hasitha
 %%% @copyright (C) 2023, <COMPANY>
 %%% @doc
+%%% To test the functionalities of the service.
 %%%
 %%% @end
 %%% Created : 29. Jun 2023 4:39 PM

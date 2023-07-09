@@ -141,7 +141,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-
+-spec store_data(string(), string()) -> ok | internal.
 store_data(Key, Data) ->
     case miniclip_gpb_utils:encrypt_data(Data) of
         {ok, {EncryptedKey, EncryptedData}} ->
@@ -150,15 +150,22 @@ store_data(Key, Data) ->
             internal
     end.
 
+-spec retrieve_data(string()) -> string() | {error, not_found} | {error, internal}.
 retrieve_data(Key) ->
     miniclip_gpb_utils:retrieve_data(Key).
 
+-spec send_set_request_response(socket:t(), ok | internal | not_found) -> ok.
 send_set_request_response(Socket, ErrorT) ->
     ok = lager:debug("send_set_request_response|ErrorT ~p", [ErrorT]),
     Response = miniclip_gpb_utils:create_response({set_request, []}, ErrorT),
     ok = lager:debug("send_set_request_response|Response ~p", [Response]),
     miniclip_gpb_utils:send_response(Socket, Response).
 
+-spec send_get_request_response(socket:t(),
+                                string(),
+                                string(),
+                                ok | internal | not_found) ->
+                                   ok.
 send_get_request_response(Socket, Key, Data, ErrorT) ->
     ok = lager:debug("send_get_request_response|ErrorT ~p", [ErrorT]),
     Response = miniclip_gpb_utils:create_response({get_request, {Key, Data}}, ErrorT),

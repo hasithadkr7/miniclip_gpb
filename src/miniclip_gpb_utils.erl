@@ -21,6 +21,7 @@
 decode_request_payload(EncodedData) ->
     kv_pb:decode_msg(EncodedData, req_envelope).
 
+-spec encrypt_data(string()) -> {ok, {binary(), binary()}} | {error, internal}.
 encrypt_data(Data) ->
     case get_data_key() of
         {ok, {EncryptedKey, Key}} ->
@@ -36,6 +37,7 @@ encrypt_data(Data) ->
             {error, internal}
     end.
 
+-spec encrypt_data(string(), string()) -> {ok, binary()} | {error, internal}.
 encrypt_data(Key, Data) ->
     try
         EncryptedData = crypto:crypto_one_time(aes_128_ctr, Key, ?IV, Data, true),
@@ -46,6 +48,7 @@ encrypt_data(Key, Data) ->
             {error, internal}
     end.
 
+-spec decrypt_data(string(), binary()) -> {ok, string()} | {error, internal}.
 decrypt_data(Key, EncryptedData) ->
     try
         Data = crypto:crypto_one_time(aes_128_ctr, Key, ?IV, EncryptedData, false),
@@ -56,6 +59,7 @@ decrypt_data(Key, EncryptedData) ->
             {error, internal}
     end.
 
+-spec decrypt_data(binary()) -> {ok, binary()} | {error, internal}.
 decrypt_data(EncryptedData) ->
     ok = configure_aws(erlcloud_kms),
     case erlcloud_kms:decrypt(EncryptedData) of
@@ -66,6 +70,7 @@ decrypt_data(EncryptedData) ->
             {error, internal}
     end.
 
+-spec store_data(string(), string(), string()) -> ok | internal.
 store_data(Key, DataKey, Data) ->
     ok = configure_aws(erlcloud_ddb2),
     {ok, TableName} = application:get_env(miniclip_gpb, aws_data_table_name),
@@ -81,6 +86,7 @@ store_data(Key, DataKey, Data) ->
             internal
     end.
 
+-spec retrieve_data(string()) -> binary() | {error, not_found} | {error, internal}.
 retrieve_data(Key) ->
     ok = configure_aws(erlcloud_ddb2),
     {ok, TableName} = application:get_env(miniclip_gpb, aws_data_table_name),
@@ -101,6 +107,7 @@ retrieve_data(Key) ->
             {error, internal}
     end.
 
+-spec create_response(tuple(), tuple() | atom()) -> ok.
 create_response({get_request, {Key, Data}}, ok) ->
     #req_envelope{type = get_response_t,
                   get_resp = #get_response{req = #data{key = Key, value = Data}, error = ok}};
@@ -109,6 +116,7 @@ create_response({get_request, _}, Error) ->
 create_response({set_request, _}, Error) ->
     #req_envelope{type = set_response_t, set_resp = #set_response{error = Error}}.
 
+-spec send_response(socket:t(), tuple()) -> ok.
 send_response(Socket, Response) ->
     EncodedResponse = kv_pb:encode_msg(Response, req_envelope),
     case gen_tcp:send(Socket, EncodedResponse) of
@@ -118,6 +126,7 @@ send_response(Socket, Response) ->
             ok = lager:error("sending response error|Reason: ~p~n", [Reason])
     end.
 
+-spec get_data_key() -> {ok, {binary(), binary()}} | {error, internal}.
 get_data_key() ->
     ok = miniclip_gpb_utils:configure_aws(erlcloud_kms),
     {ok, AwsKeyId} = application:get_env(miniclip_gpb, aws_kms_key_id),
@@ -130,6 +139,7 @@ get_data_key() ->
             {error, internal}
     end.
 
+-spec configure_aws(atom()) -> ok.
 configure_aws(erlcloud_kms) ->
     {ok, AccessKeyId} = application:get_env(miniclip_gpb, aws_access_key_id),
     {ok, SecretAccessKey} = application:get_env(miniclip_gpb, aws_secret_access_key),

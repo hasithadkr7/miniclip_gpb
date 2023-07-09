@@ -34,13 +34,13 @@
 
 <h3 class="function"><a name="configure_aws-1">configure_aws/1</a></h3>
 <div class="spec">
-<p><tt>configure_aws(X1) -&gt; any()</tt></p>
+<p><tt>configure_aws(X1::atom()) -&gt; ok</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="create_response-2">create_response/2</a></h3>
 <div class="spec">
-<p><tt>create_response(X1, Error) -&gt; any()</tt></p>
+<p><tt>create_response(X1::tuple(), Error::tuple() | atom()) -&gt; ok</tt><br></p>
 <p> </p>
 </div>
 
@@ -52,43 +52,43 @@
 
 <h3 class="function"><a name="decrypt_data-1">decrypt_data/1</a></h3>
 <div class="spec">
-<p><tt>decrypt_data(EncryptedData) -&gt; any()</tt></p>
+<p><tt>decrypt_data(EncryptedData::binary()) -&gt; {ok, binary()} | {error, internal}</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="encrypt_data-1">encrypt_data/1</a></h3>
 <div class="spec">
-<p><tt>encrypt_data(Data) -&gt; any()</tt></p>
+<p><tt>encrypt_data(Data::string()) -&gt; {ok, {binary(), binary()}} | {error, internal}</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="encrypt_data-2">encrypt_data/2</a></h3>
 <div class="spec">
-<p><tt>encrypt_data(Key, Data) -&gt; any()</tt></p>
+<p><tt>encrypt_data(Key::string(), Data::string()) -&gt; {ok, binary()} | {error, internal}</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="get_data_key-0">get_data_key/0</a></h3>
 <div class="spec">
-<p><tt>get_data_key() -&gt; any()</tt></p>
+<p><tt>get_data_key() -&gt; {ok, {binary(), binary()}} | {error, internal}</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="retrieve_data-1">retrieve_data/1</a></h3>
 <div class="spec">
-<p><tt>retrieve_data(Key) -&gt; any()</tt></p>
+<p><tt>retrieve_data(Key::string()) -&gt; binary() | {error, not_found} | {error, internal}</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="send_response-2">send_response/2</a></h3>
 <div class="spec">
-<p><tt>send_response(Socket, Response) -&gt; any()</tt></p>
+<p><tt>send_response(Socket::<a href="/home/hasitha/workspace/personal/kernel/doc/socket.html#type-t">socket:t()</a>, Response::tuple()) -&gt; ok</tt><br></p>
 <p> </p>
 </div>
 
 <h3 class="function"><a name="store_data-3">store_data/3</a></h3>
 <div class="spec">
-<p><tt>store_data(Key, DataKey, Data) -&gt; any()</tt></p>
+<p><tt>store_data(Key::string(), DataKey::string(), Data::string()) -&gt; ok | internal</tt><br></p>
 <p> </p>
 </div>
 <hr>
